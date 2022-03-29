@@ -84,6 +84,9 @@ def reject(event):
 
 def show_credits(user_id, peer_id):
     creditors = obshak.get_creditors(user_id)
+    print(creditors)
+    if not creditors:
+        send_message(peer_id, message='Вы никому не должны')
     for i in creditors:
         keyboard_pay = payments.generate_VKpay_keyboard(i[0], i[2])
         send_message(peer_id, keyboard_pay,
@@ -92,6 +95,8 @@ def show_credits(user_id, peer_id):
 
 def show_debtors(user_id, peer_id):
     debtors = obshak.get_debtors(user_id)
+    if not debtors:
+        send_message(peer_id, message='Вам никто не должен')
     for i in debtors:
         send_message(peer_id, message='ФИО' + str(i[1]) + 'сумма:' + str(i[2]) + '\n' + i[4] + '\n' + i[3])
 
@@ -99,11 +104,14 @@ def show_debtors(user_id, peer_id):
 def start_long_polling():
     for event in long_poll.listen():
         if event.type == VkBotEventType.MESSAGE_NEW:
+            """Обработка текстовых сообщений"""
             print("New message to bot: " + event.message.text)
             try:
-                if event.message.text.__str__() == 'Показать долги':
+                if event.message.text.__str__() == 'Показать долги'\
+                        or event.message.text.__str__() == '@club211937698 Показать долги':
                     show_credits(event.message.from_id, event.message.peer_id)
-                elif event.message.text.__str__() == 'Показать должников':
+                elif event.message.text.__str__() == 'Показать должников'\
+                        or event.message.text.__str__() == '@club211937698 Показать должников':
                     show_debtors(event.message.from_id, event.message.peer_id)
                 else:
                     test_data = obshak.process_message(event.message.text.__str__(), event.message.from_id)
@@ -113,6 +121,7 @@ def start_long_polling():
                 send_message(event.message.peer_id, keyboard_menu.get_keyboard(), 'Я вас не понял')
                 send_message(event.message.peer_id, keyboard_help.get_keyboard(), 'Что именно вы хотели?')
         elif event.type == VkBotEventType.MESSAGE_EVENT:
+            """Обработка всех клавиатур"""
             if event.object.payload.get('type').split('-')[0] in CALLBACK_TYPES:
                 if str(event.object.user_id) == str(event.object.payload.get('type').split('-')[1]):
                     confirm(event)

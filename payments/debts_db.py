@@ -21,9 +21,9 @@ class DebtsDatabase:
     def payoff_debt(self, creditor_id=None, debtor_id=None, amount=None):
         print("Payment: Executing PAYOFF")
         current_record = db.debts_search_by_users(creditor_id, debtor_id)
-        if (current_record == ()):
+        if current_record == ():
             raise Exception("not found")
-        if (current_record[3] < amount):
+        if current_record[3] < amount:
             raise Exception("Amount paied is more than needed")
         db.debts_update_amount(id=current_record[0], amount=current_record[3]-amount)
 
