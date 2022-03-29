@@ -71,7 +71,7 @@ def debts_search_creditors_by_debtor(debtor_id: str):
     return ids
 
 
-def fetchall(table: str, columns: List[str]) -> list[dict[str, Any]]:
+def fetchall(table: str, columns: List[str]):
     columns_joined = ", ".join(columns)
     cursor.execute(f"SELECT {columns_joined} FROM {PAYMENTS_TABLE_NAME}")
     rows = cursor.fetchall()
@@ -84,7 +84,7 @@ def fetchall(table: str, columns: List[str]) -> list[dict[str, Any]]:
     return result
 
 
-def delete(table: str, row_id: int) -> None:
+def delete(table: str, row_id: int):
     row_id = int(row_id)
     cursor.execute(f"delete from {table} where id={row_id}")
     conn.commit()
