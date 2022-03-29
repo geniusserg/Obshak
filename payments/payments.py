@@ -4,7 +4,7 @@ from vk_api.utils import get_random_id, sjson_dumps
 # создание платежных кнопок с определенными действиями и параметрами
 
 
-class VKPayInterface():
+class VKPayInterface:
     def __init__(self):
         self.test_user_id = 340953279
 

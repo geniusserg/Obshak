@@ -36,18 +36,3 @@ class DebtsDatabase:
     def get_creditors(self, user_id=None):
         print("Payment: Executing Get Creditors")
         return db.debts_search_creditors_by_debtor(user_id)
-
-    # тесты
-    def check_all(self):
-        self.set_debt("000000", "000001", 400)
-        self.set_debt("000000", "000001", 400)
-        self.set_debt("000000", "000001", 400)
-        self.set_debt("000001", "000000", 400)
-        print(db.debts_get_info_by_id(2))
-        print(db.debts_get_info_by_id(1))
-        self.set_debt("000000", "000001", 400)
-        self.payoff_debt("000000", "000001", 300)
-        self.payoff_debt("000000", "000001", 0)
-        print(db.debts_get_info_by_id(1)[3] == 100)
-        print(self.get_debtors("000000"))
-        print(self.get_creditors("000001"))

@@ -51,13 +51,13 @@ def debts_search_by_users(creditor_id: str, debtor_id: str):
 def debts_search_debtors_by_creditor(creditor_id: str):
     cursor.execute(f"SELECT * FROM {PAYMENTS_TABLE_NAME} WHERE creditor_id ='{creditor_id}'  AND amount>0")
     print(
-        f"SQL: Execute command: SELECT debtor_id FROM {PAYMENTS_TABLE_NAME} WHERE creditor_id ='{creditor_id}' AND amount>0")
-    ids = cursor.fetchall()
-    if ids == []:
+        f"SQL: Execute command: SELECT debtor_id, amount FROM {PAYMENTS_TABLE_NAME} WHERE creditor_id ='{creditor_id}' AND amount>0")
+    debtors = cursor.fetchall()
+    if not debtors:
         print("SQL: Result: Not found")
         return []
     print("SQL: Result: Found debtors")
-    return ids
+    return debtors
 
 
 def debts_search_creditors_by_debtor(debtor_id: str):
