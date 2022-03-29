@@ -30,3 +30,25 @@ jobs:
       run: |
           cd test
           pytest -v -s test.py
+  
+  CI/CD:
+    runs-on: ubuntu-latest
+    needs: my_testing
+    
+    steps:
+    
+    - name: Git clone my repository
+      uses: actions/checkout@v1
+      
+    - name: View repository files
+      run: ls -a
+    
+    - name: Work With Docker
+      run:  echo "aloxomora" | docker login -u "thisisdasha" --password-stdin
+    - name: Build image
+      run: docker build -t thisisdasha/mybotapp:latest -f Dockerfile .
+    - name: Push image to docker
+      run: docker push thisisdasha/mybotapp:latest
+
+
+       
