@@ -13,8 +13,8 @@ COPY requirements.txt ./
 RUN pip install -U -r requirements.txt
 COPY *.py ./
 COPY createdb.sql ./
-COPY ./model ./
-COPY ./payments ./
-COPY ./test ./
+COPY ./model ./model
+COPY ./payments ./payments
+COPY ./test ./test
 
 ENTRYPOINT ["python", "server.py"]
