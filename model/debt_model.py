@@ -10,17 +10,22 @@ class Debtor(NamedTuple):
     raw_text:  str
 
 
-class Message(NamedTuple):
-    creditor: Optional[int]
-    people:   list
-    amount:   list
+class Message():
+    def __init__(self, creditor, people, amount):
+        self.creditor=creditor
+        self.people = people
+        self.amount = amount
+        self.people_username = None
     def generate_message(self):
         text = ""
         for i in  range(len(self.people)):
-            text += 'Пользователь: ' + self.people[i] + ' Сумма: ' + self.amount[i] + '\n'
+            text += 'Пользователь: @id' + str(self.people_username[id][0]['id'])\
+             + ' (' + self.people_username[id] + " "\
+             + self.people_username[id][0]['last_name'] + ") " \
+             + '. Сумма: ' + self.amount[id] + "\n"
         return text
     def generate_message(self, id: int):
-        return 'Пользователь: @id' + str(self.people[id][0]['id'])\
-             + ' (' + self.people[id][0]['first_name'] + " "\
-             + self.people[id][0]['last_name'] + ") " \
+        return 'Пользователь: @id' + str(self.people_username[id][0]['id'])\
+             + ' (' + self.people_username[id][0]['first_name'] + " "\
+             + self.people_username[id][0]['last_name'] + ") " \
              + '. Сумма: ' + self.amount[id] + "\n"

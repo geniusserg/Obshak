@@ -3,14 +3,15 @@ import json
 import logging
 import exceptions
 from obshak import Obshak
+from obshak import debts_db
 from vk_api import VkApi
 from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
-from vk_api.keyboard import VkKeyboard, VkKeyboardColor
+from vk_api.keyboard import VkKeyboard, VkKeyboardButton, VkKeyboardColor
 from vk_api.utils import get_random_id
+import payments
 
 # GROUP_ID = os.getenv("VK_GROUP_ID")
 # GROUP_TOKEN = os.getenv("VK_GROUP_TOKEN")
-from payments.payments import VKPayInterface
 
 logging.basicConfig(level=logging.INFO)
 GROUP_ID = '211937698'
@@ -26,7 +27,6 @@ long_poll = VkBotLongPoll(vk_session, GROUP_ID)
 keyboard_default = VkKeyboard(one_time=False, inline=True)
 keyboard_help = VkKeyboard(one_time=False, inline=True)
 keyboard_menu = VkKeyboard(one_time=False)
-payments = VKPayInterface()
 obshak = Obshak()
 
 
@@ -46,7 +46,7 @@ def confirm_keyboard(test_data, i):
         color=VkKeyboardColor.SECONDARY,
         payload={"type": 'show_snackbar-' + str(test_data.people[i]) + '-' + str(test_data.creditor),
                  'text': str(test_data.amount[i]) + ' ' + str(test_data.generate_message(i))
-                 }
+                }
     )
     return keyboard_1.get_keyboard()
 
@@ -121,8 +121,9 @@ def start_long_polling():
                     show_debtors(event.message.from_id, event.message.peer_id)
                 else:
                     test_data = obshak.process_message(event.message.text.__str__(), event.message.from_id)
+                    test_data.people_username = []
                     for j in range(len(test_data.people)):
-                        test_data.people[j] = resolve_name(test_data.people[j])
+                        test_data.people_username.append(resolve_name(test_data.people[j]))
                     for i in range(len(test_data.people)):
                         send_message(event.message.peer_id, confirm_keyboard(test_data, i), test_data.generate_message(i))
             except exceptions.NotCorrectMessage as e:
@@ -152,6 +153,14 @@ def start_long_polling():
                 )
             elif event.object.payload.get('type') == 'show_debtors':
                 show_debtors(event.obj.user_id, event.obj.peer_id)
+                vk.messages.edit(
+                    peer_id=event.obj.peer_id,
+                    message=event.object.payload['text'],
+                    conversation_message_id=event.obj.conversation_message_id,
+                    keyboard=keyboard_default.get_keyboard(),
+                )
+            elif event.object.payload.get('type') == VkKeyboardButton.VKPAY.value:
+                #debts_db.payoff_debt(cred, event.obj.user_id, am)
                 vk.messages.edit(
                     peer_id=event.obj.peer_id,
                     message=event.object.payload['text'],
