@@ -45,7 +45,7 @@ def confirm_keyboard(test_data, i):
         label='Подтвердить',
         color=VkKeyboardColor.SECONDARY,
         payload={"type": 'show_snackbar-' + str(test_data.people[i]) + '-' + str(test_data.creditor),
-                 'text': str(test_data.amount[i]) + ' ' + str(test_data.text2[i])
+                 'text': str(test_data.amount[i]) + ' ' + str(test_data.generate_message(i))
                  }
     )
     return keyboard_1.get_keyboard()
@@ -81,6 +81,8 @@ def reject(event):
         }),
     )
 
+def resolve_name(id: str):
+    return vk_session.method("users.get", {"user_ids": id})
 
 def show_credits(user_id, peer_id):
     creditors = obshak.get_creditors(user_id)
@@ -89,8 +91,11 @@ def show_credits(user_id, peer_id):
         send_message(peer_id, message='Вы никому не должны')
     for i in creditors:
         keyboard_pay = payments.generate_VKpay_keyboard(i[0], i[2])
+        user_id = str(i[1])
+        user_screen_name = resolve_name(str(i[1]))
+        amount = str(i[2]) 
         send_message(peer_id, keyboard_pay,
-                     'ФИО' + str(i[0]) + 'сумма:' + str(i[2]) + '\n' + i[4] + '\n' + i[3])
+                     'Пользователь: ' + user_screen_name + 'сумма:' + amount + '\n' + i[4] + '\n' + i[3])
 
 
 def show_debtors(user_id, peer_id):
@@ -98,7 +103,8 @@ def show_debtors(user_id, peer_id):
     if not debtors:
         send_message(peer_id, message='Вам никто не должен')
     for i in debtors:
-        send_message(peer_id, message='ФИО' + str(i[1]) + 'сумма:' + str(i[2]) + '\n' + i[4] + '\n' + i[3])
+        user_screen_name = resolve_name(str(i[1]))
+        send_message(peer_id, message='Пользователь: ' + user_screen_name + ' сумма: ' + str(i[2]) + '\n' + i[4] + '\n' + i[3])
 
 
 def start_long_polling():
@@ -107,16 +113,18 @@ def start_long_polling():
             """Обработка текстовых сообщений"""
             print("New message to bot: " + event.message.text)
             try:
-                if event.message.text.__str__() == 'Показать долги'\
-                        or event.message.text.__str__() == '@club211937698 Показать долги':
+                if event.message.text.__str__().find('Показать долги') != -1\
+                        or event.message.text.__str__().find('@club211937698 Показать долги') != -1:
                     show_credits(event.message.from_id, event.message.peer_id)
-                elif event.message.text.__str__() == 'Показать должников'\
-                        or event.message.text.__str__() == '@club211937698 Показать должников':
+                elif event.message.text.__str__().find('Показать должников') != -1\
+                        or event.message.text.__str__().find('@club211937698 Показать должников') != -1:
                     show_debtors(event.message.from_id, event.message.peer_id)
                 else:
                     test_data = obshak.process_message(event.message.text.__str__(), event.message.from_id)
+                    for j in range(len(test_data.people)):
+                        test_data.people[j] = resolve_name(test_data.people[j])
                     for i in range(len(test_data.people)):
-                        send_message(event.message.peer_id, confirm_keyboard(test_data, i), test_data.text2[i])
+                        send_message(event.message.peer_id, confirm_keyboard(test_data, i), test_data.generate_message(i))
             except exceptions.NotCorrectMessage as e:
                 send_message(event.message.peer_id, keyboard_menu.get_keyboard(), 'Я вас не понял')
                 send_message(event.message.peer_id, keyboard_help.get_keyboard(), 'Что именно вы хотели?')

@@ -6,7 +6,6 @@ from payments.debts_db import DebtsDatabase
 
 debts_db = DebtsDatabase()
 
-
 class Obshak:
     def __init__(self):
         pass
@@ -39,14 +38,10 @@ class Obshak:
         else:
             people = []
             amount = []
-            text2 = []
-            text = ''
             for i in regexp_result:
-                text += 'ФИО:' + i[0] + ' Сумма:' + i[1] + '\n'
-                text2.append('ФИО:' + i[0] + ' Сумма:' + i[1] + '\n')
                 people.append(i[0])
                 amount.append(i[1])
-        return Message(creditor_id, people, amount, text, text2)
+        return Message(creditor_id, people, amount)
 
 
 def add_testdata_db():
