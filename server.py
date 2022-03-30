@@ -8,7 +8,7 @@ from vk_api import VkApi
 from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
 from vk_api.keyboard import VkKeyboard, VkKeyboardButton, VkKeyboardColor
 from vk_api.utils import get_random_id
-import payments
+import payments.payments as payments
 
 # GROUP_ID = os.getenv("VK_GROUP_ID")
 # GROUP_TOKEN = os.getenv("VK_GROUP_TOKEN")
@@ -90,12 +90,11 @@ def show_credits(user_id, peer_id):
     if not creditors:
         send_message(peer_id, message='Вы никому не должны')
     for i in creditors:
-        keyboard_pay = payments.generate_VKpay_keyboard(i[0], i[2])
+        #keyboard_pay = payments.generate_VKpay_keyboard(i[0], i[2])
         user_id = str(i[1])
         user_screen_name = resolve_name(str(i[1]))
         amount = str(i[2]) 
-        send_message(peer_id, keyboard_pay,
-                     'Пользователь: ' + user_screen_name + 'сумма:' + amount + '\n' + i[4] + '\n' + i[3])
+        send_message(peer_id, message='Пользователь: ' + user_id + 'сумма:' + amount + '\n' + i[4] + '\n' + i[3])
 
 
 def show_debtors(user_id, peer_id):
@@ -104,7 +103,7 @@ def show_debtors(user_id, peer_id):
         send_message(peer_id, message='Вам никто не должен')
     for i in debtors:
         user_screen_name = resolve_name(str(i[1]))
-        send_message(peer_id, message='Пользователь: ' + user_screen_name + ' сумма: ' + str(i[2]) + '\n' + i[4] + '\n' + i[3])
+        send_message(peer_id, message='Пользователь: ' + str(i[1]) + ' сумма: ' + str(i[2]) + '\n' + i[4] + '\n' + i[3])
 
 
 def start_long_polling():
